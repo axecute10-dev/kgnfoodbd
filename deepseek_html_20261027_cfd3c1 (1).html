@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>KGN - Always Fresh | Smart Menu</title>
+<meta name="theme-color" content="#D3181C" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   ব্র্যান্ড কালার ও লাইট/ডার্ক থিম ভ্যারিয়েবল
+   ============================================================ */
+:root {
+  --brand:      #D3181C;   
+  --brand-dark: #9e1013;   
+  --black:      #111111;   
+  --bg:         #f4f6f9;   
+  --card:       #ffffff;
+  --text:       #2d3748;
+  --muted:      #718096;
+  --line:       #e2e8f0;
+  --radius:     16px;
+  --shadow:     0 4px 15px rgba(0,0,0,0.05);
+  --shadow-hover: 0 8px 25px rgba(211,24,28,0.15);
+  --nav-bg:     rgba(244, 246, 249, 0.85);
+}
+
+/* ডার্ক থিম কালার */
+[data-theme="dark"] {
+  --brand:      #ef4444;   
+  --brand-dark: #b91c1c;
+  --black:      #f8fafc;   
+  --bg:         #0f172a;   
+  --card:       #1e293b;   
+  --text:       #f1f5f9;
+  --muted:      #94a3b8;
+  --line:       #334155;
+  --shadow:     0 4px 15px rgba(0,0,0,0.4);
+  --shadow-hover: 0 8px 25px rgba(239,68,68,0.2);
+  --nav-bg:     rgba(15, 23, 42, 0.85);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Hind Siliguri', system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.5;
+  padding-bottom: 80px;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+img { display: block; max-width: 100%; }
+
+/* ============================================================
+   ১) হেডার স্লাইডশো
+   ============================================================ */
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 250px; 
+  background: #000;
+  overflow: hidden;
+}
+@media (min-width: 768px) { .hero-section { height: 400px; } }
+.slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+.slide.active { opacity: 1; }
+.hero-overlay {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.8) 100%);
+}
+
+/* ============================================================
+   ২) লোগো এবং ব্র্যান্ড নাম (ওভারল্যাপ)
+   ============================================================ */
+.brand-container {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  margin-top: -55px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.logo {
+  height: 110px; width: 110px;
+  border-radius: 50%; background: #fff; padding: 4px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  object-fit: contain;
+}
+.logo-fallback {
+  height: 110px; width: 110px;
+  border-radius: 50%; background: #fff; padding: 4px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  display: grid; place-items: center;
+  font-size: 32px; font-weight: 800; color: var(--brand);
+}
+.brand-text {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+  color: #fff;
+  padding: 12px 45px;
+  border-radius: 50px;
+  margin-top: -20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  border: 2px solid #fff;
+}
+.brand-text h1 { font-size: 22px; font-weight: 700; }
+.brand-text p { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; opacity: 0.9; margin-top: 2px; }
+
+/* ============================================================
+   ৩) সার্চ বার এবং থিম টগল
+   ============================================================ */
+.search-container {
+  padding: 15px 20px;
+  margin-top: 15px;
+  position: relative;
+  z-index: 10;
+  max-width: 650px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.search-box {
+  flex: 1;
+  display: flex; align-items: center;
+  background: var(--card); border-radius: 999px;
+  padding: 10px 20px; box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+  transition: all 0.3s;
+}
+.search-box:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(211,24,28,0.2);
+}
+.search-box svg { width: 20px; height: 20px; fill: var(--muted); margin-right: 10px; }
+.search-box input {
+  border: none; outline: none; width: 100%;
+  font-family: inherit; font-size: 15px; color: var(--text);
+  background: transparent;
+}
+.search-box input::placeholder { color: var(--muted); }
+
+/* থিম টগল বাটন */
+.theme-toggle {
+  background: var(--card); border: 1px solid var(--line);
+  width: 46px; height: 46px; border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer;
+  box-shadow: var(--shadow); color: var(--text);
+  transition: all 0.3s;
+}
+.theme-toggle:hover { transform: scale(1.05); }
+.theme-toggle svg { width: 22px; height: 22px; fill: currentColor; }
+
+/* ============================================================
+   ৪) ক্যাটাগরি ট্যাব (Glassmorphism)
+   ============================================================ */
+nav {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; gap: 10px; overflow-x: auto;
+  padding: 12px 20px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  scrollbar-width: none;
+  max-width: 650px;
+  margin: 0 auto;
+  transition: background 0.4s ease;
+}
+nav::-webkit-scrollbar { display: none; }
+.tab {
+  flex: 0 0 auto;
+  padding: 8px 20px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--card);
+  color: var(--muted); font-size: 14.5px; font-family: inherit;
+  white-space: nowrap; cursor: pointer; font-weight: 600;
+  transition: all 0.3s;
+}
+.tab:hover { color: var(--text); border-color: var(--muted); }
+.tab.active {
+  background: var(--brand); color: #fff; border-color: var(--brand);
+  box-shadow: 0 4px 12px rgba(211,24,28,0.4);
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   ৫) মেনু কার্ড
+   ============================================================ */
+main {
+  padding: 15px 20px; display: flex; flex-direction: column; gap: 15px;
+  max-width: 650px; margin: 0 auto;
+}
+.item {
+  display: flex; gap: 15px; align-items: center;
+  background: var(--card); border-radius: var(--radius);
+  padding: 12px; box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+  transition: transform 0.2s, box-shadow 0.2s, background 0.4s;
+  animation: slideUp 0.4s ease-out forwards;
+  opacity: 0; transform: translateY(10px);
+}
+@keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+.item:hover { 
+  box-shadow: var(--shadow-hover); 
+  transform: translateY(-3px); 
+  border-color: var(--brand);
+}
+
+.item-img {
+  width: 100px; height: 100px; flex: 0 0 100px;
+  border-radius: 12px; object-fit: cover; background: var(--bg);
+}
+.item-placeholder {
+  width: 100px; height: 100px; flex: 0 0 100px;
+  border-radius: 12px; background: var(--bg);
+  border: 2px dashed var(--line);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: var(--muted); font-size: 10px; text-align: center;
+  transition: all 0.4s;
+}
+.item-placeholder span { font-size: 28px; margin-bottom: 4px; }
+
+.item-info { flex: 1; min-width: 0; }
+.item-info h2 { 
+  font-size: 17px; font-weight: 700; color: var(--text); line-height: 1.3; 
+  transition: color 0.4s;
+}
+.price-tag {
+  display: inline-block; margin-top: 8px;
+  background: rgba(211, 24, 28, 0.1);
+  color: var(--brand); padding: 4px 12px;
+  border-radius: 8px; font-weight: 700; font-size: 15px;
+  transition: all 0.4s;
+}
+[data-theme="dark"] .price-tag {
+  background: rgba(239, 68, 68, 0.15);
+  text-shadow: 0 0 8px rgba(239,68,68,0.4);
+}
+
+/* ============================================================
+   ৬) ফ্লোটিং হোয়াটসঅ্যাপ বাটন
+   ============================================================ */
+.fab-whatsapp {
+  position: fixed; bottom: 25px; right: 25px;
+  width: 60px; height: 60px;
+  background: #25D366; color: #fff;
+  border-radius: 50%; display: grid; place-items: center;
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+  z-index: 50; transition: transform 0.2s;
+  text-decoration: none;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+.fab-whatsapp:active { transform: scale(0.9); }
+.fab-whatsapp svg { width: 32px; height: 32px; fill: currentColor; }
+
+/* ============================================================
+   ৭) ফুটার
+   ============================================================ */
+footer {
+  margin-top: 30px; padding: 30px 20px 50px;
+  text-align: center; background: var(--black); color: var(--bg);
+  border-radius: 30px 30px 0 0;
+  transition: all 0.4s;
+}
+[data-theme="dark"] footer { background: #020617; color: var(--muted); }
+footer .wifi { font-size: 14px; margin-bottom: 8px; }
+footer .addr { font-size: 13px; line-height: 1.6; margin-bottom: 15px; }
+
+.empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- হেডার স্লাইডশো -->
+<div class="hero-section">
+  <img class="slide active" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1200&auto=format&fit=crop" alt="Slide 1" />
+  <img class="slide" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop" alt="Slide 2" />
+  <img class="slide" src="https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=1200&auto=format&fit=crop" alt="Slide 3" />
+  <img class="slide" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1200&auto=format&fit=crop" alt="Slide 4" />
+  <div class="hero-overlay"></div>
+</div>
+
+<!-- লোগো এবং নাম -->
+<div class="brand-container">
+  <img class="logo" src="images/logo.webp" alt="KGN Logo" 
+       onerror="this.style.display='none'; document.getElementById('logoText').style.display='grid';" />
+  <div class="logo-fallback" id="logoText" style="display:none;">KGN</div>
+  <div class="brand-text">
+    <h1>KGN Restaurant</h1>
+    <p>Always Fresh</p>
+  </div>
+</div>
+
+<!-- সার্চ বার + থিম টগল -->
+<div class="search-container">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    <input type="text" id="searchInput" placeholder="খাবারের নাম খুঁজুন..." oninput="handleSearch()">
+  </div>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle Theme">
+    <svg viewBox="0 0 24 24" id="themeIcon"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+  </button>
+</div>
+
+<!-- ট্যাব এবং মেনু -->
+<nav id="tabs"></nav>
+<main id="menu"></main>
+
+<!-- হোয়াটসঅ্যাপ বাটন -->
+<a href="https://wa.me/8801700000000" class="fab-whatsapp" target="_blank" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.4A10 10 0 1 0 12 2zm0 2a8 8 0 1 1-4.3 14.7l-.5-.3-2.5.7.7-2.4-.3-.5A8 8 0 0 1 12 4z"/><path d="M9.3 7.6c.2 0 .4 0 .5.4l.8 1.8c.1.2 0 .4-.1.5l-.5.6c-.1.2-.2.3 0 .6.3.5.7 1 1.2 1.4.5.4 1 .7 1.3.8.2.1.3 0 .5-.1l.6-.7c.1-.2.3-.2.5-.1l1.8.8c.2.1.3.2.3.4 0 .6-.3 1.3-.8 1.6-.4.2-1 .3-1.6.1-.4-.1-.9-.3-1.6-.6-2.4-1-3.9-3.3-4-3.5-.1-.2-1-1.3-1-2.5 0-1.2.6-1.8.8-2z"/></svg>
+</a>
+
+<!-- ফুটার -->
+<footer>
+  <p class="wifi">📶 Wi-Fi: KGN_Guest / pass1234</p>
+  <p class="addr">১২৩ রোড, ঢাকা · প্রতিদিন সকাল ১১টা – রাত ১১টা</p>
+</footer>
+
+<script>
+/* ============================================================
+   ১) থিম টগল লজিক (Dark/Light Mode)
+   ============================================================ */
+const themeToggleBtn = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const moonPath = "M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z";
+const sunPath = "M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0 .996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0 .996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 0 0 0-1.41.996.996 0 0 0-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41.39.39 1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 0 0 0-1.41.996.996 0 0 0-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41.39.39 1.03.39 1.41 0l1.06-1.06z";
+
+let currentTheme = localStorage.getItem('kgn-theme') || 'light';
+document.documentElement.setAttribute('data-theme', currentTheme);
+updateThemeIcon(currentTheme);
+
+function toggleTheme() {
+  currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  localStorage.setItem('kgn-theme', currentTheme);
+  updateThemeIcon(currentTheme);
+}
+function updateThemeIcon(theme) {
+  themeIcon.innerHTML = theme === 'dark' ? `<path d="${sunPath}"/>` : `<path d="${moonPath}"/>`;
+}
+
+/* ============================================================
+   ২) স্লাইডশো লজিক
+   ============================================================ */
+let slideIndex = 0;
+const slides = document.querySelectorAll('.slide');
+function showSlides() {
+  slides.forEach(slide => slide.classList.remove('active'));
+  slideIndex++;
+  if (slideIndex >= slides.length) { slideIndex = 0; }
+  slides[slideIndex].classList.add('active');
+}
+setInterval(showSlides, 4000);
+
+/* ============================================================
+   ৩) সম্পূর্ণ মেনু ডেটা (সব ছবি থেকে নেওয়া)
+   ============================================================ */
+const MENU = [
+  {
+    category: "বিরিয়ানি",
+    items: [
+      { name: "চিকেন বিরিয়ানি (ব্রয়লার)", price: "১৮০/-", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=400&auto=format&fit=crop" },
+      { name: "চিকেন বিরিয়ানি (সোনালী)", price: "২২০/-", image: "" },
+      { name: "বিফ বিরিয়ানি", price: "২৫০/-", image: "" },
+      { name: "হায়দ্রাবাদি বিরিয়ানি (মাটন)", price: "৩২০/-", image: "" },
+      { name: "চিকেন খেফসা", price: "১১৯৯/-", image: "" },
+      { name: "মাটন খেফসা", price: "১৪৯৯/-", image: "" },
+      { name: "চিকেন বিরিয়ানি (এক্সট্রা রাইস) ১:১", price: "৮০/-", image: "" },
+      { name: "হায়দ্রাবাদি বিরিয়ানি (এক্সট্রা রাইস) ১:১", price: "১৫০/-", image: "" },
+      { name: "চিকেন (এক্সট্রা)", price: "১১০/-", image: "" },
+      { name: "সোনালী (এক্সট্রা)", price: "১৪০/-", image: "" },
+      { name: "মাটন (এক্সট্রা)", price: "১৭০/-", image: "" }
+    ]
+  },
+  {
+    category: "সালাদ ও ভেজিটেবল",
+    items: [
+      { name: "মিক্স সালাদ", price: "১২০/-", image: "" },
+      { name: "ক্যাসল সালাদ", price: "৩৬০/-", image: "" },
+      { name: "চাইনিজ ভেজিটেবল ১:৩", price: "২৫০/-", image: "" },
+      { name: "চিকেন চাইনিজ ভেজিটেবল ১:৩", price: "৩০০/-", image: "" },
+      { name: "গার্লিক মাশরুম ভেজিটেবল ১:৩", price: "৩২০/-", image: "" }
+    ]
+  },
+  {
+    category: "চা",
+    items: [
+      { name: "মালাই চা", price: "৯০/-", image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?q=80&w=400&auto=format&fit=crop" },
+      { name: "বাদাম চা", price: "৯০/-", image: "" },
+      { name: "চকলেট চা", price: "৯০/-", image: "" },
+      { name: "রেগুলার চা", price: "৩০/-", image: "" },
+      { name: "হরলিক্স চা", price: "৪০/-", image: "" },
+      { name: "মালটোভা চা", price: "৫০/-", image: "" },
+      { name: "নেস্ক্যাফ চা", price: "৫০/-", image: "" },
+      { name: "নাবানি চা", price: "৪০/-", image: "" },
+      { name: "তান্দুরি চা", price: "৪০/-", image: "" }
+    ]
+  },
+  {
+    category: "কফি",
+    items: [
+      { name: "রেগুলার হট কফি", price: "১০০/-", image: "" },
+      { name: "হট চকলেট কফি", price: "১২০/-", image: "" },
+      { name: "ব্লাক কফি", price: "৮০/-", image: "" },
+      { name: "কোল্ড কফি", price: "১৭০/-", image: "" },
+      { name: "চকলেট কোল্ড কফি", price: "১৯০/-", image: "" }
+    ]
+  },
+  {
+    category: "ইন্ডিয়ান খাবার",
+    items: [
+      { name: "চিকেন গ্রিল ১/৪", price: "১৫০/-", image: "" },
+      { name: "গ্রিল (ফুল)", price: "৫৮০/-", image: "" },
+      { name: "চিকেন চপ", price: "১৮০/-", image: "" },
+      { name: "চিকেন শার্মি", price: "১২০/-", image: "" },
+      { name: "চিকেন মাসালা (৬ পিস)", price: "৩৫০/-", image: "" },
+      { name: "চিকেন আগারি (৮ পিস)", price: "৩৫০/-", image: "" },
+      { name: "বিফ মাসালা (৮ পিস)", price: "৪০০/-", image: "" },
+      { name: "বিফ আগারি (৮ পিস)", price: "৪৫০/-", image: "" }
+    ]
+  },
+  {
+    category: "কাবাব",
+    items: [
+      { name: "বিফ সিক কাবাব", price: "২২০/-", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?q=80&w=400&auto=format&fit=crop" },
+      { name: "কাশ্মীরি কাবাব", price: "১৮০/-", image: "" },
+      { name: "রেসিপি কাবাব", price: "১৮০/-", image: "" },
+      { name: "BBQ/তান্দুরি কাবাব", price: "১৮০/-", image: "" },
+      { name: "টার্কিশ আদানা", price: "১৮০/-", image: "" },
+      { name: "চিকেন আদানা", price: "২০০/-", image: "" },
+      { name: "বিফ আদানা", price: "২২০/-", image: "" },
+      { name: "কোরাল মাছ ১ কেজি (কাবাব)", price: "১৪৯৯/-", image: "" },
+      { name: "তেলাপিয়া মাছ ১ কেজি (কাবাব)", price: "৮০০/-", image: "" }
+    ]
+  },
+  {
+    category: "পরাটা ও নান",
+    items: [
+      { name: "রেগুলার পরাটা", price: "২০/-", image: "" },
+      { name: "শাহী পরাটা", price: "৩০/-", image: "" },
+      { name: "লাচ্ছা পরাটা", price: "৫০/-", image: "" },
+      { name: "প্লেইন নান", price: "২০/-", image: "" },
+      { name: "বাটার নান", price: "৩০/-", image: "" },
+      { name: "গার্লিক নান", price: "৫০/-", image: "" },
+      { name: "কাশ্মীরি নান", price: "১০০/-", image: "" },
+      { name: "ভেজিন পেশোয়ার নান", price: "১২০/-", image: "" }
+    ]
+  },
+  {
+    category: "লাচ্ছি",
+    items: [
+      { name: "ম্যাঙ্গো লাচ্ছি", price: "১৮০/-", image: "https://images.unsplash.com/photo-1571006682888-ef96af00a53f?q=80&w=400&auto=format&fit=crop" },
+      { name: "সুইট লাচ্ছি", price: "১২০/-", image: "" },
+      { name: "চকলেট লাচ্ছি", price: "১৬০/-", image: "" },
+      { name: "স্ট্রবেরি লাচ্ছি", price: "১৮০/-", image: "" },
+      { name: "বানানা লাচ্ছি", price: "১৫০/-", image: "" },
+      { name: "বাটার স্কচ লাচ্ছি", price: "১৮০/-", image: "" },
+      { name: "ক্লার মালাই লাচ্ছি", price: "১৮০/-", image: "" },
+      { name: "কফি লাচ্ছি", price: "১৮০/-", image: "" },
+      { name: "মরিও লাচ্ছি", price: "২০০/-", image: "" },
+      { name: "ক্যাসেটরি লাচ্ছি", price: "২২০/-", image: "" },
+      { name: "কিচেন লাচ্ছি", price: "২২০/-", image: "" }
+    ]
+  },
+  {
+    category: "মিল্ক শেক",
+    items: [
+      { name: "ভ্যানিলা মিল্ক শেক", price: "১৭০/-", image: "" },
+      { name: "চকলেট মিল্ক শেক", price: "১৯০/-", image: "" },
+      { name: "স্ট্রবেরি মিল্ক শেক", price: "১৭০/-", image: "" },
+      { name: "ম্যাঙ্গো মিল্ক শেক", price: "১৯০/-", image: "" },
+      { name: "বাটার স্কচ মিল্ক শেক", price: "১৮০/-", image: "" },
+      { name: "ক্লার মালাই মিল্ক শেক", price: "১৮০/-", image: "" },
+      { name: "কফি শেক", price: "১৮০/-", image: "" },
+      { name: "মরিও মিল্ক শেক", price: "২২০/-", image: "" },
+      { name: "ফাইটিং স্টার মিল্ক শেক", price: "২২০/-", image: "" },
+      { name: "কিচেন মিল্ক শেক", price: "২৪০/-", image: "" },
+      { name: "কেটেলারি মিল্ক শেক", price: "২৪০/-", image: "" },
+      { name: "ড্রাগন মিল্ক শেক", price: "২৪০/-", image: "" }
+    ]
+  },
+  {
+    category: "ফুচকা",
+    items: [
+      { name: "দই ফুচকা", price: "১৫০/-", image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop" },
+      { name: "রেগুলার ফুচকা", price: "৬০/-", image: "" },
+      { name: "নাগা ফুচকা", price: "১৫০/-", image: "" },
+      { name: "শাহী ফুচকা", price: "১৫০/-", image: "" },
+      { name: "চকলেট ফুচকা", price: "২০০/-", image: "" },
+      { name: "চিকেন ফুচকা", price: "২০০/-", image: "" }
+    ]
+  },
+  {
+    category: "চটপটি",
+    items: [
+      { name: "রেগুলার চটপটি", price: "৬০/-", image: "" },
+      { name: "চিকেন চটপটি", price: "১২০/-", image: "" },
+      { name: "শাহী চটপটি", price: "১৮০/-", image: "" }
+    ]
+  },
+  {
+    category: "ফ্রেশ জুস",
+    items: [
+      { name: "মাল্টা জুস", price: "১৫০/-", image: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?q=80&w=400&auto=format&fit=crop" },
+      { name: "ম্যাঙ্গো জুস", price: "১৮০/-", image: "" },
+      { name: "পেপে জুস", price: "১২০/-", image: "" },
+      { name: "আপেল জুস", price: "১৮০/-", image: "" },
+      { name: "আঙুর জুস", price: "২২০/-", image: "" },
+      { name: "আনারস জুস", price: "১২০/-", image: "" },
+      { name: "ড্রাগন জুস", price: "২২০/-", image: "" },
+      { name: "আনার জুস", price: "২২০/-", image: "" },
+      { name: "মিক্স ককটেল জুস", price: "২২০/-", image: "" },
+      { name: "তরমুজ জুস", price: "১২০/-", image: "" },
+      { name: "লেবু জুস", price: "১২০/-", image: "" },
+      { name: "কলা জুস", price: "৯০/-", image: "" }
+    ]
+  },
+  {
+    category: "সেট মেনু",
+    items: [
+      { name: "সেট মেনু ১ (ফ্রাইড রাইস, চিকেন ফ্রাই, চাইনিজ ভেজিটেবল, সফট ড্রিংকস)", price: "২৫০/-", image: "" },
+      { name: "সেট মেনু ২ (ফ্রাইড রাইস, থাই ফ্রাই চিকেন, চাইনিজ ভেজিটেবল, চিকেন মাশালা)", price: "৩৫০/-", image: "" },
+      { name: "সেট মেনু ৩ (ফ্রাইড রাইস, ফ্রাই চিকেন, চিকেন চিলি ওনিয়ন, চিকেন মাশালা)", price: "৪০০/-", image: "" },
+      { name: "কে.জি.এন স্পেশাল (সেট মেনু)", price: "৫৫০/-", image: "" }
+    ]
+  },
+  {
+    category: "ফ্রাইড রাইস",
+    items: [
+      { name: "ফ্রাইড রাইস ১:৩", price: "৮০/-", image: "" },
+      { name: "থাই ফ্রাইড রাইস ১:৩", price: "৪৫০/-", image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=400&auto=format&fit=crop" },
+      { name: "ভেজিন স্পেশাল ফ্রাইড রাইস ১:৩", price: "৫০০/-", image: "" }
+    ]
+  },
+  {
+    category: "অ্যাপেটাইজার",
+    items: [
+      { name: "ফ্রেঞ্চ ফ্রাই", price: "১৫০/-", image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?q=80&w=400&auto=format&fit=crop" },
+      { name: "চিকেন ফ্রাই (২ পিস)", price: "২২০/-", image: "" },
+      { name: "থাই ফ্রাইড চিকেন (৪পিস)", price: "২৫০/-", image: "" },
+      { name: "চিকেন পপকর্ন", price: "২৫০/-", image: "" },
+      { name: "চিকেন ফিঙ্গার (৪পিস)", price: "২২০/-", image: "" },
+      { name: "ফিস ফিঙ্গার (৪পিস)", price: "৩০০/-", image: "" },
+      { name: "অন্নন (৬পিস)", price: "১৫০/-", image: "" },
+      { name: "চিকেন নাগা ইউজলেস (৬পিস)", price: "২৫০/-", image: "" },
+      { name: "হট উইংস (৬পিস)", price: "২২০/-", image: "" },
+      { name: "চিকেন ফ্রাই ক্রস (উইথ হট স্পাইস)", price: "২২০/-", image: "" },
+      { name: "চিকেন ফিজ নাচোজ", price: "২৮০/-", image: "" },
+      { name: "চিকেন মিট বল", price: "২২০/-", image: "" }
+    ]
+  },
+  {
+    category: "বার্গার",
+    items: [
+      { name: "কে.জি.এন স্পেশাল বার্গার", price: "৪৫০/-", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=400&auto=format&fit=crop" },
+      { name: "রেগুলার বার্গার", price: "২০০/-", image: "" },
+      { name: "চিকেন জিজ বার্গার", price: "১৯০/-", image: "" },
+      { name: "ডাবল ডেকার বার্গার", price: "৩২০/-", image: "" }
+    ]
+  },
+  {
+    category: "পিৎজা",
+    items: [
+      { name: "রয়েল পিৎজা (১০ ইঞ্চি)", price: "৬৯৯/-", image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=400&auto=format&fit=crop" },
+      { name: "রেগুলার পিৎজা (৮ ইঞ্চি)", price: "১২০/-", image: "" },
+      { name: "রেগুলার পিৎজা (১০ ইঞ্চি)", price: "১৮০/-", image: "" },
+      { name: "রয়েল পিৎজা (৮ ইঞ্চি)", price: "৪৯৯/-", image: "" },
+      { name: "রয়েল পিৎজা (১২ ইঞ্চি)", price: "৮৯৯/-", image: "" },
+      { name: "কে.জি.এন স্পেশাল পিৎজা (৮ ইঞ্চি)", price: "৬৯৯/-", image: "" },
+      { name: "কে.জি.এন স্পেশাল পিৎজা (১০ ইঞ্চি)", price: "৭৯৯/-", image: "" },
+      { name: "কে.জি.এন স্পেশাল পিৎজা (১২ ইঞ্চি)", price: "১১৯৯/-", image: "" }
+    ]
+  },
+  {
+    category: "নুডলস ও পাস্তা",
+    items: [
+      { name: "চিকেন চাউমিন ১:১", price: "১৫০/-", image: "" },
+      { name: "কে.জি.এন স্পেশাল চাউমিন ১:৩", price: "৪৫০/-", image: "" },
+      { name: "হট সস পাস্তা ১:২", price: "২৮০/-", image: "" },
+      { name: "হোয়াইট সস পাস্তা ১:৩", price: "৪৩০/-", image: "" },
+      { name: "কোরিয়ান রামেন", price: "৩৮০/-", image: "" }
+    ]
+  },
+  {
+    category: "সুপ",
+    items: [
+      { name: "থাই সুপ থিক ১:৩", price: "৪৩০/-", image: "https://images.unsplash.com/photo-1547592180-85f173990554?q=80&w=400&auto=format&fit=crop" },
+      { name: "ক্রিমি সুপ ১:৩", price: "৩৫০/-", image: "" },
+      { name: "চিকেন কর্ন সুপ ১:৩", price: "৩৫০/-", image: "" },
+      { name: "চিকেন কর্ন সুপ (সাথে অনন্য) ১:৩", price: "৪৮০/-", image: "" },
+      { name: "ক্রিম অফ মাশরুম ১:৩", price: "৫৫০/-", image: "" }
+    ]
+  },
+  {
+    category: "সিজলিং",
+    items: [
+      { name: "চিকেন সিজলিং ১:২", price: "৩৫০/-", image: "" },
+      { name: "বিফ সিজলিং ১:২", price: "৪৮০/-", image: "" }
+    ]
+  }
+];
+
+/* ============================================================
+   ৪) স্মার্ট সার্চ এবং ট্যাব লজিক
+   ============================================================ */
+const $ = id => document.getElementById(id);
+let currentCategory = MENU[0];
+
+const tabsEl = $("tabs");
+MENU.forEach((cat, i) => {
+  const b = document.createElement("button");
+  b.className = "tab" + (i === 0 ? " active" : "");
+  b.textContent = cat.category;
+  b.onclick = () => {
+    $("searchInput").value = ""; 
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    b.classList.add("active");
+    currentCategory = cat;
+    renderMenu(cat.items);
+    b.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+  };
+  tabsEl.appendChild(b);
+});
+
+function renderMenu(items) {
+  const menu = $("menu");
+  menu.innerHTML = "";
+  
+  if (items.length === 0) {
+    menu.innerHTML = `<div class="empty-state"><h3>কোনো খাবার পাওয়া যায়নি!</h3><p>অন্য কিছু লিখে সার্চ করুন।</p></div>`;
+    return;
+  }
+
+  items.forEach((item, index) => {
+    const card = document.createElement("article");
+    card.className = "item";
+    card.style.animationDelay = `${index * 0.05}s`;
+    
+    let imgHTML = item.image 
+      ? `<img class="item-img" src="${item.image}" alt="${item.name}" loading="lazy" />`
+      : `<div class="item-placeholder"><span>🍽️</span>ছবি যুক্ত করুন</div>`;
+
+    card.innerHTML = `
+      ${imgHTML}
+      <div class="item-info">
+        <h2>${item.name}</h2>
+        <span class="price-tag">৳ ${item.price}</span>
+      </div>
+    `;
+    menu.appendChild(card);
+  });
+}
+
+function handleSearch() {
+  const query = $("searchInput").value.toLowerCase().trim();
+  
+  if (query === "") {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    tabsEl.children[currentCategory ? MENU.indexOf(currentCategory) : 0].classList.add("active");
+    renderMenu(currentCategory.items);
+    return;
+  }
+
+  const allItems = MENU.flatMap(cat => cat.items);
+  const filtered = allItems.filter(item => item.name.toLowerCase().includes(query));
+  
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  renderMenu(filtered);
+}
+
+renderMenu(MENU[0].items);
+</script>
+</body>
+</html>
